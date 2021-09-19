@@ -1,0 +1,26 @@
+
+Func findThemAll($oElementStart, $TreeScope)
+    Local $hTimer = TimerInit()
+;~  Get result with findall function alternative could be the treewalker
+    Dim $pCondition, $pTrueCondition
+    Dim $pElements, $iLength
+
+    $UIA_oUIAutomation.CreateTrueCondition($pTrueCondition)
+    $oCondition = ObjCreateInterface($pTrueCondition, $sIID_IUIAutomationCondition, $dtagIUIAutomationCondition)
+;~  $oCondition1 = _AutoItObject_WrapperCreate($aCall[1], $dtagIUIAutomationCondition)
+;~ Tricky to search all descendants on html objects or from desktop/root element
+    $oElementStart.FindAll($TreeScope, $oCondition, $pElements)
+
+    $oAutomationElementArray = ObjCreateInterface($pElements, $sIID_IUIAutomationElementArray, $dtagIUIAutomationElementArray)
+
+    $oAutomationElementArray.Length($iLength)
+    For $i = 0 To $iLength - 1; it's zero based
+        $oAutomationElementArray.GetElement($i, $UIA_pUIElement)
+        $oUIElement = ObjCreateInterface($UIA_pUIElement, $sIID_IUIAutomationElement, $dtagIUIAutomationElement)
+        ConsoleWrite("Title is: " & _UIA_getPropertyValue($oUIElement, $UIA_NamePropertyId) & @TAB & "Class=" & _UIA_getPropertyValue($oUIElement, $uia_classnamepropertyid) & @CRLF)
+    Next
+
+    Local $fDiff = TimerDiff($hTimer)
+    Consolewrite("Findthemall took: " & $fDiff & " milliseconds" & @CRLF & @CRLF)
+
+EndFunc   ;==>findThemAll
